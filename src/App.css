@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: white;
+  }
+}
+
+.typing-animation {
+  overflow: hidden; /* Hides text until it is revealed */
+  white-space: nowrap; /* Prevents the text from wrapping */
+  border-right: 0.15em solid white; /* The "cursor" for the typing effect */
+  width: 0; /* Starts the element with zero width */
+  animation: typing 3.5s steps(25, end) forwards,
+    /* Typing effect animation */ blink-caret 0.75s step-end infinite; /* Blinking cursor animation */
+}
