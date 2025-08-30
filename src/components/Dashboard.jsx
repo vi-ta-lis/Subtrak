@@ -14,24 +14,53 @@ export default function Dashboard() {
   });
   const [editIndex, setEditIndex] = useState(null);
 
-  // Save to localStorage whenever subscriptions change
+  // Persist to localStorage whenever subscriptions change
   useEffect(() => {
     localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
+    // Optional: helpful for debugging
+    // console.log("subscriptions updated:", subscriptions);
   }, [subscriptions]);
 
+  // Optional: keep in sync across browser tabs
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "subscriptions") {
+        try {
+          setSubscriptions(e.newValue ? JSON.parse(e.newValue) : []);
+        } catch {
+          setSubscriptions([]);
+        }
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // Normalize and add/update subscription
   const handleAddSubscription = (sub) => {
+    // Normalize shape: prefer `amount`, fallback to `price`
+    const normalized = {
+      ...sub,
+      amount: Number(sub.amount ?? sub.price ?? 0),
+    };
+
     if (editIndex !== null) {
-      const updated = [...subscriptions];
-      updated[editIndex] = sub;
-      setSubscriptions(updated);
+      setSubscriptions((prev) => {
+        const copy = [...prev];
+        copy[editIndex] = normalized;
+        return copy;
+      });
       setEditIndex(null);
     } else {
-      setSubscriptions([...subscriptions, sub]);
+      setSubscriptions((prev) => [...prev, normalized]);
     }
+
+    // close modal after adding/updating
+    setIsModalOpen(false);
   };
 
   const handleDelete = (index) => {
-    setSubscriptions(subscriptions.filter((_, i) => i !== index));
+    setSubscriptions((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleEdit = (index) => {
@@ -52,8 +81,31 @@ export default function Dashboard() {
     return "Active";
   };
 
+  // Live totals
+  const totalCount = subscriptions.length;
+  const totalCost = subscriptions.reduce(
+    (sum, sub) => sum + (Number(sub.amount) || 0),
+    0
+  );
+
   return (
     <div className="p-6">
+      {/* Small summary cards */}
+      <div className="mb-6 flex justify-center gap-4 flex-wrap">
+        <div className="bg-white shadow rounded-lg p-4 w-40 text-center">
+          <h3 className="text-gray-600 font-medium">Subscriptions</h3>
+          <p className="text-2xl font-bold text-indigo-600">{totalCount}</p>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-4 w-48 text-center">
+          <h3 className="text-gray-600 font-medium">Total Monthly</h3>
+          <p className="text-2xl font-bold text-indigo-600">
+            ${totalCost.toFixed(2)}
+          </p>
+        </div>
+      </div>
+
+      {/* Add Subscription Button */}
       <div className="flex justify-center mb-6">
         <button
           onClick={() => {
@@ -66,6 +118,7 @@ export default function Dashboard() {
         </button>
       </div>
 
+      {/* Active Subscriptions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {subscriptions.map((sub, index) => (
           <ActiveSubscribersCard
@@ -77,6 +130,7 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Subscription Modal */}
       <SubscriptionModal
         isOpen={isModalOpen}
         onClose={() => {

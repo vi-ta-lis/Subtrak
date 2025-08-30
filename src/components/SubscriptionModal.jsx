@@ -72,7 +72,7 @@ export default function SubscriptionModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base text-black focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -85,7 +85,7 @@ export default function SubscriptionModal({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base text-black focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -99,7 +99,7 @@ export default function SubscriptionModal({
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base text-black focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 

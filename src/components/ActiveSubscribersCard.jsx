@@ -53,7 +53,7 @@ export default function ActiveSubscribersCard({
       </div>
 
       <div className="bg-white p-4">
-        <h3 className="text-lg font-semibold">{name}</h3>
+        <h3 className="text-lg font-semibold text-black">{name}</h3>
         <p className="text-gray-700">${price} / month</p>
         <p className="text-sm text-gray-500">Next payment: {date}</p>
         <p className={`mt-2 ${statusColors[status] || ""}`}>Status: {status}</p>
