@@ -14,14 +14,12 @@ export default function Dashboard() {
   });
   const [editIndex, setEditIndex] = useState(null);
 
-  // Persist to localStorage whenever subscriptions change
+  // Save to localStorage when subscriptions change
   useEffect(() => {
     localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
-    // Optional: helpful for debugging
-    // console.log("subscriptions updated:", subscriptions);
   }, [subscriptions]);
 
-  // Optional: keep in sync across browser tabs
+  // Sync across browser tabs
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "subscriptions") {
@@ -36,26 +34,23 @@ export default function Dashboard() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // Normalize and add/update subscription
+  // Add or update subscription
   const handleAddSubscription = (sub) => {
-    // Normalize shape: prefer `amount`, fallback to `price`
     const normalized = {
       ...sub,
       amount: Number(sub.amount ?? sub.price ?? 0),
     };
 
-    if (editIndex !== null) {
-      setSubscriptions((prev) => {
+    setSubscriptions((prev) => {
+      if (editIndex !== null) {
         const copy = [...prev];
         copy[editIndex] = normalized;
         return copy;
-      });
-      setEditIndex(null);
-    } else {
-      setSubscriptions((prev) => [...prev, normalized]);
-    }
+      }
+      return [...prev, normalized];
+    });
 
-    // close modal after adding/updating
+    setEditIndex(null);
     setIsModalOpen(false);
   };
 
@@ -69,6 +64,7 @@ export default function Dashboard() {
   };
 
   const getRenewalStatus = (date) => {
+    if (!date) return "Unknown";
     const today = new Date();
     const renewalDate = new Date(date);
     if (isNaN(renewalDate)) return "Unknown";
@@ -81,7 +77,7 @@ export default function Dashboard() {
     return "Active";
   };
 
-  // Live totals
+  // Totals
   const totalCount = subscriptions.length;
   const totalCost = subscriptions.reduce(
     (sum, sub) => sum + (Number(sub.amount) || 0),
@@ -89,15 +85,15 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="p-6">
-      {/* Small summary cards */}
-      <div className="mb-6 flex justify-center gap-4 flex-wrap">
-        <div className="bg-white shadow rounded-lg p-4 w-40 text-center">
+    <div className="p-4 sm:p-6 lg:p-8">
+      {/* Summary cards */}
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:flex sm:justify-center sm:gap-6">
+        <div className="bg-white shadow-md rounded-2xl p-4 flex flex-col items-center justify-center w-full sm:w-40 transition transform hover:scale-105">
           <h3 className="text-gray-600 font-medium">Subscriptions</h3>
           <p className="text-2xl font-bold text-indigo-600">{totalCount}</p>
         </div>
 
-        <div className="bg-white shadow rounded-lg p-4 w-48 text-center">
+        <div className="bg-white shadow-md rounded-2xl p-4 flex flex-col items-center justify-center w-full sm:w-48 transition transform hover:scale-105">
           <h3 className="text-gray-600 font-medium">Total Monthly</h3>
           <p className="text-2xl font-bold text-indigo-600">
             ${totalCost.toFixed(2)}
@@ -112,7 +108,7 @@ export default function Dashboard() {
             setEditIndex(null);
             setIsModalOpen(true);
           }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 cursor-pointer"
+          className="px-5 py-2 bg-indigo-600 text-white rounded-xl shadow-md hover:bg-indigo-700 hover:shadow-lg transition"
         >
           + Add Subscription
         </button>
@@ -120,14 +116,20 @@ export default function Dashboard() {
 
       {/* Active Subscriptions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {subscriptions.map((sub, index) => (
-          <ActiveSubscribersCard
-            key={index}
-            subscription={{ ...sub, status: getRenewalStatus(sub.date) }}
-            onEdit={() => handleEdit(index)}
-            onDelete={() => handleDelete(index)}
-          />
-        ))}
+        {subscriptions.length > 0 ? (
+          subscriptions.map((sub, index) => (
+            <ActiveSubscribersCard
+              key={index}
+              subscription={{ ...sub, status: getRenewalStatus(sub.date) }}
+              onEdit={() => handleEdit(index)}
+              onDelete={() => handleDelete(index)}
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 col-span-full">
+            No subscriptions added yet.
+          </p>
+        )}
       </div>
 
       {/* Subscription Modal */}
