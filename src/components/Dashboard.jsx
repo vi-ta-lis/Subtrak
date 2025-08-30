@@ -6,6 +6,7 @@ import {
   MotionModal,
   MotionListItem,
 } from "../components/Animation/AnimatedWrapper";
+import { AnimatePresence } from "framer-motion";
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -121,21 +122,23 @@ export default function Dashboard() {
 
       {/* Active Subscriptions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {subscriptions.length > 0 ? (
-          subscriptions.map((sub, index) => (
-            <MotionListItem key={index} index={index}>
-              <ActiveSubscribersCard
-                subscription={{ ...sub, status: getRenewalStatus(sub.date) }}
-                onEdit={() => handleEdit(index)}
-                onDelete={() => handleDelete(index)}
-              />
-            </MotionListItem>
-          ))
-        ) : (
-          <p className="text-center text-gray-500 col-span-full">
-            No subscriptions added yet.
-          </p>
-        )}
+        <AnimatePresence mode="popLayout">
+          {subscriptions.length > 0 ? (
+            subscriptions.map((sub, index) => (
+              <MotionListItem key={index} index={index}>
+                <ActiveSubscribersCard
+                  subscription={{ ...sub, status: getRenewalStatus(sub.date) }}
+                  onEdit={() => handleEdit(index)}
+                  onDelete={() => handleDelete(index)}
+                />
+              </MotionListItem>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 col-span-full">
+              No subscriptions added yet.
+            </p>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Subscription Modal */}
