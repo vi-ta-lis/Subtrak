@@ -42,7 +42,7 @@ export default function Navbar() {
             </li>
           </ul>
         </div>
-        <a className="text-xl font-extrabold p-1.5">Subtrak</a>
+        <a className="text-xl font-extrabold p-4">Subtrak</a>
       </div>
       <div className="navbar-end hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
